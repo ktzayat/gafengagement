@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contrat d'engagement bénévole</title>
+<meta name="theme-color" content="#f2f2f7" id="themeColor">
+<script>
+  // Thème : choix mémorisé, sinon celui de l'appareil
+  function applyTheme(t) {
+    const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    document.documentElement.classList.toggle("is-dark", dark);
+    document.getElementById("themeColor").content = dark ? "#000000" : "#f2f2f7";
+  }
+  let savedTheme = null;
+  try { savedTheme = localStorage.getItem("theme"); } catch (_) {}
+  applyTheme(savedTheme);
+</script>
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --text: #1d1d1f;
+    --secondary: #6e6e73;
+    --tertiary: #aeaeb2;
+    --separator: rgba(60, 60, 67, .16);
+    --field: #ffffff;
+    --accent: #0071e3;
+    --danger: #d70015;
+    --switch-off: #e9e9eb;
+    --switch-on: #34c759;
+    --segment: #e3e3e8;
+    --segment-on: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000;
+      --card: #1c1c1e;
+      --text: #f5f5f7;
+      --secondary: #98989d;
+      --tertiary: #636366;
+      --separator: rgba(84, 84, 88, .55);
+      --field: #1c1c1e;
+      --accent: #2997ff;
+      --danger: #ff453a;
+      --switch-off: #39393d;
+      --switch-on: #30d158;
+      --segment: #2c2c2e;
+      --segment-on: #636366;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --card: #1c1c1e; --text: #f5f5f7; --secondary: #98989d; --tertiary: #636366;
+    --separator: rgba(84, 84, 88, .55); --field: #1c1c1e; --accent: #2997ff; --danger: #ff453a;
+    --switch-off: #39393d; --switch-on: #30d158; --segment: #2c2c2e; --segment-on: #636366;
+  }
+
+  :root { color-scheme: light; }
+  :root.is-dark { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.35;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: max(20px, env(safe-area-inset-top)) 16px max(40px, env(safe-area-inset-bottom));
+  }
+
+  /* En-tête */
+  .brand { display: flex; align-items: center; gap: 12px; margin: 12px 4px 28px; }
+  .brand svg { width: 34px; height: auto; flex: none; }
+  .brand-name { font-weight: 600; font-size: 17px; letter-spacing: -.2px; }
+  .brand-sub { color: var(--secondary); font-size: 13px; }
+  h1 { font-size: 32px; line-height: 1.12; letter-spacing: -.6px; font-weight: 700; margin: 0 4px 32px; }
+
+
+  /* Groupes façon Réglages */
+  .group-title {
+    color: var(--secondary); font-size: 13px; text-transform: uppercase; letter-spacing: .2px;
+    margin: 0 16px 7px;
+  }
+  .group {
+    background: var(--card); border-radius: 12px; overflow: hidden;
+  }
+  .group-note { color: var(--secondary); font-size: 13px; margin: 7px 16px 0; }
+  .group-note:empty { display: none; }
+  section { margin-bottom: 34px; }
+
+  .row {
+    display: flex; align-items: center; min-height: 46px; padding: 0 16px; gap: 12px;
+    position: relative;
+  }
+  .row + .row::before {
+    content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 1px;
+    background: var(--separator); transform: scaleY(.6);
+  }
+  .row label, .row .label { flex: 0 0 132px; font-size: 16px; }
+  .row input, .row select {
+    flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text);
+    font: inherit; font-size: 16px; padding: 12px 0; text-align: right;
+  }
+  .row input::placeholder { color: var(--tertiary); }
+  .row select { -webkit-appearance: none; appearance: none; cursor: pointer; color: var(--secondary); padding-right: 16px;
+    background: no-repeat right center / 8px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 13'%3E%3Cpath d='M1 1l5.5 5.5L1 12' fill='none' stroke='%23aeaeb2' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"); }
+  .row select.filled { color: var(--text); }
+  .row input[type="date"] { min-height: 46px; }
+  .row input[type="date"]::-webkit-date-and-time-value { text-align: right; }
+  .row.invalid label, .row.invalid .label { color: var(--danger); }
+
+  @media (max-width: 420px) {
+    .row label, .row .label { flex-basis: 112px; font-size: 15px; }
+  }
+
+  /* Contrôle segmenté */
+  .segmented {
+    display: grid; grid-template-columns: 1fr 1fr; background: var(--segment); border-radius: 9px;
+    padding: 2px; margin: 10px 16px; gap: 2px;
+  }
+  .segmented input { position: absolute; opacity: 0; pointer-events: none; }
+  .segmented label {
+    text-align: center; font-size: 14px; font-weight: 500; padding: 7px 8px; border-radius: 7px; cursor: pointer;
+  }
+  .segmented input:checked + label { background: var(--segment-on); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .segmented input:focus-visible + label { outline: 2px solid var(--accent); }
+  .invalid .segmented { box-shadow: 0 0 0 1.5px var(--danger); }
+
+  /* Interrupteur */
+  .switch-row { justify-content: space-between; padding-top: 10px; padding-bottom: 10px; }
+  .switch-row .label { flex: 1; font-size: 15px; }
+  .switch { position: relative; flex: none; width: 51px; height: 31px; }
+  .switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+  .switch span {
+    position: absolute; inset: 0; border-radius: 31px; background: var(--switch-off); transition: background .2s;
+  }
+  .switch span::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%;
+    background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.18); transition: transform .2s;
+  }
+  .switch input:checked + span { background: var(--switch-on); }
+  .switch input:checked + span::after { transform: translateX(20px); }
+  .switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .invalid .switch span { box-shadow: 0 0 0 1.5px var(--danger); }
+
+  /* Contrat */
+  details { position: relative; }
+  details + details::before {
+    content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 1px;
+    background: var(--separator); transform: scaleY(.6);
+  }
+  summary {
+    list-style: none; cursor: pointer; padding: 13px 40px 13px 16px; font-size: 16px; position: relative;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: ""; position: absolute; right: 18px; top: 50%; width: 7px; height: 7px; margin-top: -5px;
+    border-right: 2px solid var(--tertiary); border-bottom: 2px solid var(--tertiary); transform: rotate(-45deg);
+    transition: transform .2s;
+  }
+  details[open] summary::after { transform: rotate(45deg); margin-top: -6px; }
+  .article { padding: 0 16px 16px; color: var(--secondary); font-size: 15px; line-height: 1.5; }
+  .article p { margin: 0 0 8px; }
+  .article ul { margin: 0; padding-left: 18px; }
+  .article li { margin-bottom: 4px; }
+  .article strong { color: var(--text); font-weight: 600; }
+
+  /* Signature */
+  .pad-wrap { padding: 12px 16px 14px; }
+  .pad-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .pad-head span { font-size: 13px; color: var(--secondary); }
+  .link { background: none; border: 0; color: var(--accent); font: inherit; font-size: 15px; padding: 4px 0; cursor: pointer; }
+  canvas.pad {
+    display: block; width: 100%; aspect-ratio: 3 / 1; background: #fff; border-radius: 10px;
+    border: 1px solid var(--separator); touch-action: none; cursor: crosshair;
+  }
+  .invalid canvas.pad { border-color: var(--danger); }
+
+  /* Bouton principal */
+  .primary {
+    display: block; width: 100%; border: 0; border-radius: 12px; background: var(--accent); color: #fff;
+    font: inherit; font-size: 17px; font-weight: 600; padding: 15px; cursor: pointer;
+  }
+  .primary:active { opacity: .7; }
+  .primary:disabled { opacity: .5; }
+  .secondary-btn {
+    display: block; width: 100%; border: 0; border-radius: 12px; background: var(--segment); color: var(--accent);
+    font: inherit; font-size: 17px; font-weight: 600; padding: 15px; cursor: pointer; margin-top: 10px;
+  }
+  .error { color: var(--danger); font-size: 14px; text-align: center; margin: 12px 0 0; min-height: 1em; }
+
+
+  /* Feuille de résultat */
+  dialog {
+    border: 0; padding: 0; background: transparent; max-width: 100vw; width: 100%; margin: auto auto 0;
+  }
+  dialog::backdrop { background: rgba(0,0,0,.35); }
+  .sheet {
+    background: var(--bg); border-radius: 14px 14px 0 0; max-width: 620px; margin: 0 auto;
+    padding: 26px 16px max(22px, env(safe-area-inset-bottom)); text-align: center;
+  }
+  @media (min-width: 660px) {
+    dialog { margin: auto; }
+    .sheet { border-radius: 14px; max-width: 420px; }
+  }
+  .sheet h2 { font-size: 22px; margin: 10px 0 6px; letter-spacing: -.3px; }
+  .sheet p { color: var(--secondary); font-size: 15px; margin: 0 0 22px; }
+  .check {
+    width: 56px; height: 56px; border-radius: 50%; background: var(--switch-on); margin: 0 auto;
+    display: grid; place-items: center;
+  }
+  .sheet .link { margin-top: 14px; }
+
+  .theme-btn {
+    margin-left: auto; flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; padding: 0;
+    background: var(--card); color: var(--text); display: grid; place-items: center; cursor: pointer;
+  }
+  .theme-btn svg { width: 18px; height: 18px; }
+  .theme-btn .sun { display: none; }
+  .is-dark .theme-btn .sun { display: block; }
+  .is-dark .theme-btn .moon { display: none; }
+
+  footer { text-align: center; color: var(--tertiary); font-size: 12px; margin-top: 40px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand">
+      <svg viewBox="295 185 580 660" aria-hidden="true"><defs><mask id="gafCut"><rect x="0" y="0" width="1000" height="1000" fill="#fff"/><rect x="195.6" y="483" width="648.7" height="34" fill="#000"/></mask></defs><path mask="url(#gafCut)" fill="currentColor" d="M466.45 834.8Q387.25 834.8 345.4 783.95Q303.54999999999995 733.1 303.54999999999995 629.6Q303.54999999999995 602.6 306.69999999999993 571.0999999999999Q309.84999999999997 539.5999999999999 316.15 505.4Q335.95 392.0 371.95 323.59999999999997Q407.95 255.19999999999993 461.95000000000005 224.59999999999997Q515.95 194.0 587.05 194.0Q632.05 194.0 665.8 204.34999999999997Q699.55 214.69999999999993 722.05 234.94999999999993Q744.55 255.19999999999993 755.8 285.79999999999995Q767.05 316.4 767.05 356.9Q767.05 373.09999999999997 765.25 391.09999999999997Q763.45 409.09999999999997 759.8499999999999 428.9H601.45Q604.15 416.3 605.5 404.15Q606.8499999999999 392.0 606.8499999999999 381.2Q606.8499999999999 371.3 605.05 362.75Q603.25 354.2 598.75 347.9Q594.25 341.59999999999997 586.6 338.45Q578.95 335.3 567.25 335.3Q550.15 335.3 538.0 342.5Q525.85 349.7 517.75 363.65Q509.65 377.59999999999997 504.25 399.2Q498.85 420.8 493.45 449.59999999999997Q482.65 509.0 476.79999999999995 545.0Q470.95 581.0 467.79999999999995 600.8Q464.65 620.6 463.75 630.5Q462.85 640.4 462.85 646.7Q462.85 662.9 466.9 673.25Q470.95 683.6 480.4 688.55Q489.85 693.5 505.15 693.5Q526.75 693.5 540.25 681.35Q553.75 669.2 561.85 649.85Q569.95 630.5 573.55 608.9L574.45 604.4H514.15L536.65 478.4H751.75L690.55 824.0H606.8499999999999V766.4Q593.3499999999999 785.3 574.0 800.5999999999999Q554.65 815.9 528.55 825.3499999999999Q502.45 834.8 466.45 834.8Z"/><polygon fill="#FF3D21" points="754.3,824.0 846.3,824.0 865.9,732.0 773.9,732.0"/></svg>
+      <div>
+        <div class="brand-name" data-asso-name></div>
+        <div class="brand-sub" data-asso-sigle></div>
+      </div>
+      <button type="button" class="theme-btn" id="theme" aria-label="Mode sombre">
+        <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M5.3 18.7l1.5-1.5M17.2 6.8l1.5-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <h1>Contrat d'engagement bénévole</h1>
+  </header>
+
+  <form id="form" novalidate autocomplete="on">
+    <section>
+      <div class="group-title">Identité</div>
+      <div class="group">
+        <div class="row"><label for="prenom">Prénom</label><input id="prenom" name="prenom" autocomplete="given-name" placeholder="Requis" required></div>
+        <div class="row"><label for="nom">Nom</label><input id="nom" name="nom" autocomplete="family-name" placeholder="Requis" required></div>
+        <div class="row"><label for="naissance">Date de naissance</label><input id="naissance" name="naissance" type="date" autocomplete="bday" required></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="group-title">Coordonnées</div>
+      <div class="group">
+        <div class="row"><label for="adresse">Adresse</label><input id="adresse" name="adresse" autocomplete="street-address" placeholder="Requis" required></div>
+        <div class="row"><label for="cp">Code postal</label><input id="cp" name="cp" inputmode="numeric" autocomplete="postal-code" placeholder="95500" pattern="\d{5}" maxlength="5" required></div>
+        <div class="row"><label for="ville">Ville</label><input id="ville" name="ville" autocomplete="address-level2" placeholder="Gonesse" required></div>
+        <div class="row"><label for="tel">Téléphone</label><input id="tel" name="tel" type="tel" autocomplete="tel" placeholder="06 00 00 00 00" required></div>
+        <div class="row"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" placeholder="nom@exemple.fr" required></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="group-title">En cas d'urgence, prévenir</div>
+      <div class="group">
+        <div class="row"><label for="urgNom">Nom</label><input id="urgNom" name="urgNom" placeholder="Prénom Nom" required></div>
+        <div class="row"><label for="urgTel">Téléphone</label><input id="urgTel" name="urgTel" type="tel" placeholder="06 00 00 00 00" required></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="group-title">Engagement</div>
+      <div class="group">
+        <div class="row">
+          <label for="pole">Pôle</label>
+          <select id="pole" name="pole" required>
+            <option value="">Choisir</option>
+          </select>
+        </div>
+        <div class="row"><label for="debut">Début</label><input id="debut" name="debut" type="date" required></div>
+      </div>
+      <p class="group-note" id="poleNote"></p>
+    </section>
+
+    <section id="imageSection">
+      <div class="group-title">Droit à l'image</div>
+      <div class="group">
+        <div class="segmented" role="radiogroup" aria-label="Droit à l'image">
+          <input type="radio" name="image" id="imgOui" value="oui"><label for="imgOui">J'accepte</label>
+          <input type="radio" name="image" id="imgNon" value="non"><label for="imgNon">Je refuse</label>
+        </div>
+      </div>
+    </section>
+
+    <section id="parentSection" hidden>
+      <div class="group-title">Représentant légal</div>
+      <div class="group">
+        <div class="row"><label for="parNom">Nom et prénom</label><input id="parNom" name="parNom" placeholder="Requis"></div>
+        <div class="row">
+          <label for="parLien">Lien</label>
+          <select id="parLien" name="parLien">
+            <option value="">Choisir</option>
+            <option>Mère</option>
+            <option>Père</option>
+            <option>Tuteur légal</option>
+            <option>Tutrice légale</option>
+          </select>
+        </div>
+        <div class="row"><label for="parTel">Téléphone</label><input id="parTel" name="parTel" type="tel" placeholder="06 00 00 00 00"></div>
+        <div class="pad-wrap" id="padParentWrap">
+          <div class="pad-head"><span>Signature du représentant légal</span><button type="button" class="link" data-clear="parent">Effacer</button></div>
+          <canvas class="pad" id="padParent" aria-label="Zone de signature du représentant légal"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="group-title">Le contrat</div>
+      <div class="group" id="contract"></div>
+    </section>
+
+    <section>
+      <div class="group-title">Signature</div>
+      <div class="group">
+        <div class="pad-wrap" id="padMainWrap">
+          <div class="pad-head"><span>Signature du bénévole</span><button type="button" class="link" data-clear="main">Effacer</button></div>
+          <canvas class="pad" id="padMain" aria-label="Zone de signature du bénévole"></canvas>
+        </div>
+        <div class="row switch-row" id="acceptRow">
+          <span class="label" id="acceptLabel">J'ai lu le contrat et je m'engage à le respecter</span>
+          <span class="switch"><input type="checkbox" id="accept" aria-labelledby="acceptLabel"><span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <button type="submit" class="primary" id="submit">Signer et créer le PDF</button>
+    <p class="error" id="error" role="alert"></p>
+  </form>
+
+  <footer>Logo provisoire · <span data-asso-name></span></footer>
+</main>
+
+<dialog id="done">
+  <div class="sheet">
+    <div class="check"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h2>Contrat signé</h2>
+    <p>Téléchargez le PDF puis envoyez-le dans le groupe WhatsApp de l'association.</p>
+    <button type="button" class="primary" id="download">Télécharger le PDF</button>
+    <button type="button" class="secondary-btn" id="share" hidden>Partager…</button>
+    <button type="button" class="link" id="close">Modifier le contrat</button>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ---------- À personnaliser ---------- */
+const ASSO = {
+  nom: "Gonesse Activités & Festivités",
+  sigle: "G.A.F",
+  ville: "Gonesse",
+  cp: "95500",
+  representant: "",          // ex. "Prénom Nom" : apparaîtra dans le contrat
+  qualite: "Président(e)"
+};
+
+const POLES = {
+  "Chef de projet": "Piloter un projet de A à Z sur tous ses aspects (communication, logistique, finances et staff), respecter les échéances et s'assurer que le projet se déroule dans un cadre réglementaire.",
+  "Staff": "Être présent autant que possible lors des événements et prêter main-forte au reste de l'équipe.",
+  "Communication": "Porter le message de l'association et soigner l'image qu'elle renvoie : publier des contenus fidèles à l'association, qui la mettent en valeur, avec une présence régulière.",
+  "Logistique": "Trouver les lieux, les équipements, le matériel et les moyens de transport nécessaires aux événements.",
+  "Financier": "Démarcher des partenaires, obtenir des subventions et établir chaque année un budget prévisionnel des dépenses et des recettes."
+};
+
+/* ---------- Texte du contrat (source unique pour la page et le PDF) ---------- */
+function contract(d) {
+  const ph = (v, p) => v || p;
+  const rep = ASSO.representant ? `représentée par ${ASSO.representant}, ${ASSO.qualite}` : "représentée par les membres de son bureau";
+  const blocks = [
+    { title: "Préambule", body: [
+      { p: `Le présent contrat est conclu entre l'association ${ASSO.nom} (${ASSO.sigle}), basée à ${ASSO.ville}, ${rep}, ci-après « l'association », et ${ph(d.fullName, "le bénévole signataire")}, ci-après « le bénévole ».` },
+      { p: "Le bénévole s'engage librement et sans rémunération. Ce contrat est un engagement moral réciproque : il ne crée aucun lien de subordination et ne constitue pas un contrat de travail. Il précise ce que chacun peut attendre de l'autre." }
+    ]},
+    { title: "Article 1 - L'association et son projet", body: [
+      { p: `L'association a pour but de faire vivre la ville de ${ASSO.ville} et de créer du lien entre ses habitants à travers le sport, les loisirs et les actions solidaires. Elle s'adresse en priorité aux jeunes, sans oublier les aînés, dans le respect et l'épanouissement de chacun.` }
+    ]},
+    { title: "Article 2 - Mission du bénévole", body: [
+      { p: `Le bénévole rejoint le pôle « ${ph(d.pole, "...")} ».` },
+      { p: d.pole ? POLES[d.pole] : "La mission du pôle choisi sera précisée ici." },
+      { p: "Sa mission peut évoluer d'un commun accord. Le bénévole participe aux activités et aux événements, propose des idées et des initiatives, et aide à l'organisation. La communication entre les pôles est essentielle : chacun tient l'équipe informée de son avancement." }
+    ]},
+    { title: "Article 3 - Engagements de l'association", body: [
+      { p: "L'association s'engage à :" },
+      { li: [
+        "accueillir le bénévole et l'informer de son fonctionnement, de ses projets et de ses valeurs ;",
+        "lui confier une mission adaptée à ses compétences et à ses disponibilités ;",
+        "l'accompagner et l'écouter : ses avis et ses idées sont pris en considération ;",
+        "souscrire une assurance couvrant la responsabilité civile des bénévoles pendant leurs activités ;",
+        "rembourser les frais engagés pour son compte, sur justificatifs et avec l'accord préalable du bureau ;",
+        "lui remettre, s'il le demande, une attestation de bénévolat."
+      ]}
+    ]},
+    { title: "Article 4 - Engagements du bénévole", body: [
+      { p: "Le bénévole s'engage à :" },
+      { li: [
+        "adhérer au projet et aux valeurs de l'association, et respecter ses statuts et son règlement intérieur ;",
+        "respecter les participants, les autres bénévoles et les partenaires, sans aucune discrimination ;",
+        "avoir un comportement exemplaire et bienveillant, en particulier envers les mineurs accueillis ;",
+        "être présent et ponctuel sur les missions qu'il accepte, et prévenir le plus tôt possible en cas d'empêchement ;",
+        "respecter les consignes de sécurité et les décisions prises collectivement ;",
+        "prendre soin des lieux, du matériel et des équipements qui lui sont confiés ;",
+        "rester discret sur les informations internes et les données personnelles dont il a connaissance ;",
+        "ne pas s'exprimer ni prendre d'engagement (financier, contractuel ou public) au nom de l'association sans l'accord du bureau ;",
+        "ne pas utiliser son rôle dans l'association à des fins personnelles, commerciales, politiques ou religieuses ;",
+        "ne consommer ni alcool ni stupéfiants pendant les activités."
+      ]}
+    ]},
+    { title: "Article 5 - Gratuité", body: [
+      { p: "Le bénévole ne perçoit aucune rémunération, sous quelque forme que ce soit. Seuls les frais prévus à l'article 3 peuvent lui être remboursés." }
+    ]},
+    { title: "Article 6 - Droit à l'image", body: [
+      { p: d.image === "oui"
+          ? "Le bénévole autorise l'association à utiliser, sans contrepartie, les photos et vidéos sur lesquelles il apparaît, prises dans le cadre de ses activités, pour sa communication (réseaux sociaux, affiches, site internet, presse locale)."
+          : d.image === "non"
+            ? "Le bénévole n'autorise pas l'association à diffuser des photos ou vidéos sur lesquelles il est reconnaissable."
+            : "Le choix du bénévole concernant l'utilisation de son image sera indiqué ici." },
+      { p: "Ce choix peut être modifié à tout moment sur simple demande au bureau." }
+    ]},
+    { title: "Article 7 - Données personnelles", body: [
+      { p: "Les informations recueillies servent uniquement à la gestion des bénévoles et ne sont transmises à aucun tiers. Conformément au RGPD, le bénévole peut y accéder, les faire rectifier ou demander leur suppression en contactant le bureau." }
+    ]},
+    { title: "Article 8 - Durée et fin de l'engagement", body: [
+      { p: `Le présent engagement prend effet le ${ph(d.debutTxt, "...")} pour une durée d'un an, renouvelable par tacite reconduction.` },
+      { p: "Le bénévole comme l'association peuvent y mettre fin à tout moment, en prévenant l'autre partie dans un délai raisonnable. En cas de manquement grave à ces engagements, l'association peut mettre fin à la collaboration après avoir entendu le bénévole." }
+    ]}
+  ];
+  if (d.minor) {
+    blocks.push({ title: "Article 9 - Autorisation parentale", body: [
+      { p: `Je soussigné(e) ${ph(d.parNom, "...")}, ${ph(d.parLien ? d.parLien.toLowerCase() : "", "représentant légal")} de ${ph(d.fullName, "...")}, autorise mon enfant à s'engager comme bénévole au sein de l'association ${ASSO.nom} dans les conditions décrites ci-dessus, et déclare en avoir pris connaissance.` }
+    ]});
+  }
+  return blocks;
+}
+
+/* ---------- Utilitaires ---------- */
+const $ = (id) => document.getElementById(id);
+const form = $("form");
+document.querySelectorAll("[data-asso-name]").forEach((el) => (el.textContent = ASSO.nom));
+document.querySelectorAll("[data-asso-sigle]").forEach((el) => (el.textContent = ASSO.sigle));
+
+$("theme").addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(next);
+  try { localStorage.setItem("theme", next); } catch (_) {}
+  $("theme").setAttribute("aria-label", next === "dark" ? "Mode clair" : "Mode sombre");
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  let t = null;
+  try { t = localStorage.getItem("theme"); } catch (_) {}
+  if (!t) applyTheme(null);
+});
+
+const frDate = (iso) => {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+};
+const todayIso = () => {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+};
+const ageAt = (iso) => {
+  if (!iso) return null;
+  const b = new Date(iso + "T00:00:00"), n = new Date();
+  let a = n.getFullYear() - b.getFullYear();
+  if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--;
+  return a;
+};
+const cap = (s) => s.trim().toLowerCase().replace(/(^|[\s-])\p{L}/gu, (c) => c.toUpperCase());
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+for (const p of Object.keys(POLES)) $("pole").add(new Option(p, p));
+$("debut").value = todayIso();
+
+function data() {
+  const v = (id) => $(id).value.trim();
+  const prenom = cap(v("prenom")), nom = v("nom").toUpperCase();
+  const age = ageAt(v("naissance"));
+  return {
+    prenom, nom,
+    fullName: [prenom, nom].filter(Boolean).join(" "),
+    naissance: v("naissance"), age,
+    minor: age !== null && age < 18,
+    adresse: v("adresse"), cp: v("cp"), ville: v("ville"), tel: v("tel"), email: v("email"),
+    urgNom: v("urgNom"), urgTel: v("urgTel"),
+    pole: v("pole"), debut: v("debut"), debutTxt: frDate(v("debut")),
+    image: (form.querySelector('input[name="image"]:checked') || {}).value || "",
+    parNom: v("parNom"), parLien: v("parLien"), parTel: v("parTel")
+  };
+}
+
+/* ---------- Rendu du contrat à l'écran ---------- */
+function renderContract() {
+  const d = data();
+  const open = new Set([...document.querySelectorAll("#contract details[open]")].map((el) => el.dataset.i));
+  $("contract").innerHTML = contract(d).map((b, i) => `
+    <details data-i="${i}"${open.has(String(i)) ? " open" : ""}>
+      <summary>${esc(b.title)}</summary>
+      <div class="article">${b.body.map((x) => x.li
+        ? `<ul>${x.li.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>`
+        : `<p>${esc(x.p)}</p>`).join("")}</div>
+    </details>`).join("");
+
+  $("pole").classList.toggle("filled", !!d.pole);
+  $("parLien").classList.toggle("filled", !!d.parLien);
+  $("poleNote").textContent = d.pole ? POLES[d.pole] : "";
+  $("parentSection").hidden = !d.minor;
+  if (d.minor) parentPad.fit();
+}
+
+/* ---------- Pavé de signature ---------- */
+class Pad {
+  constructor(canvas) {
+    this.c = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.strokes = [];
+    let drawing = false;
+    const pt = (e) => {
+      const r = this.c.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
+    };
+    canvas.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      drawing = true;
+      canvas.setPointerCapture(e.pointerId);
+      this.strokes.push([pt(e)]);
+      this.draw();
+    });
+    canvas.addEventListener("pointermove", (e) => {
+      if (!drawing) return;
+      this.strokes[this.strokes.length - 1].push(pt(e));
+      this.draw();
+    });
+    const end = () => {
+      if (drawing) { drawing = false; canvas.dispatchEvent(new Event("signed", { bubbles: true })); }
+    };
+    canvas.addEventListener("pointerup", end);
+    canvas.addEventListener("pointercancel", end);
+    new ResizeObserver(() => this.fit()).observe(canvas);
+  }
+  fit() {
+    const r = this.c.getBoundingClientRect();
+    if (!r.width) return;
+    const dpr = window.devicePixelRatio || 1;
+    this.c.width = Math.round(r.width * dpr);
+    this.c.height = Math.round(r.height * dpr);
+    this.draw();
+  }
+  paint(ctx, w, h, width) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = "#111";
+    ctx.fillStyle = "#111";
+    ctx.lineWidth = width;
+    ctx.lineCap = ctx.lineJoin = "round";
+    for (const s of this.strokes) {
+      const p = s.map(([x, y]) => [x * w, y * h]);
+      if (p.length === 1) {
+        ctx.beginPath(); ctx.arc(p[0][0], p[0][1], width / 2, 0, Math.PI * 2); ctx.fill();
+        continue;
+      }
+      ctx.beginPath();
+      ctx.moveTo(p[0][0], p[0][1]);
+      for (let i = 1; i < p.length - 1; i++) {
+        ctx.quadraticCurveTo(p[i][0], p[i][1], (p[i][0] + p[i + 1][0]) / 2, (p[i][1] + p[i + 1][1]) / 2);
+      }
+      ctx.lineTo(p[p.length - 1][0], p[p.length - 1][1]);
+      ctx.stroke();
+    }
+  }
+  draw() { this.paint(this.ctx, this.c.width, this.c.height, 2.4 * (window.devicePixelRatio || 1)); }
+  clear() { this.strokes = []; this.draw(); }
+  get empty() { return !this.strokes.some((s) => s.length > 2); }
+  png() {
+    const out = document.createElement("canvas");
+    out.width = 900; out.height = 300;
+    this.paint(out.getContext("2d"), out.width, out.height, 6);
+    return out.toDataURL("image/png");
+  }
+}
+const mainPad = new Pad($("padMain"));
+const parentPad = new Pad($("padParent"));
+document.querySelectorAll("[data-clear]").forEach((b) =>
+  b.addEventListener("click", () => (b.dataset.clear === "main" ? mainPad : parentPad).clear()));
+
+/* ---------- Validation ---------- */
+function validate(d) {
+  const bad = [];
+  const need = ["prenom", "nom", "naissance", "adresse", "cp", "ville", "tel", "email", "urgNom", "urgTel", "pole", "debut"];
+  if (d.minor) need.push("parNom", "parLien", "parTel");
+  for (const id of need) if (!$(id).value.trim()) bad.push($(id).closest(".row"));
+  if (d.cp && !/^\d{5}$/.test(d.cp)) bad.push($("cp").closest(".row"));
+  if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) bad.push($("email").closest(".row"));
+  for (const id of ["tel", "urgTel"].concat(d.minor ? ["parTel"] : [])) {
+    if ($(id).value && $(id).value.replace(/\D/g, "").length < 10) bad.push($(id).closest(".row"));
+  }
+  if (!d.image) bad.push($("imageSection"));
+  if (d.minor && parentPad.empty) bad.push($("padParentWrap"));
+  if (mainPad.empty) bad.push($("padMainWrap"));
+  if (!$("accept").checked) bad.push($("acceptRow"));
+
+  document.querySelectorAll(".invalid").forEach((el) => el.classList.remove("invalid"));
+  bad.forEach((el) => el.classList.add("invalid"));
+  return bad;
+}
+
+form.addEventListener("input", (e) => {
+  renderContract();
+  const row = e.target.closest(".invalid");
+  if (row) row.classList.remove("invalid");
+});
+form.addEventListener("signed", (e) => e.target.closest(".pad-wrap").classList.remove("invalid"));
+
+/* ---------- Logo pour le PDF ---------- */
+function logoPng() {
+  const svg = document.querySelector(".brand svg").outerHTML
+    .replace(/currentColor/g, "#1d1d1f")
+    .replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg" width="580" height="660"');
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = 580; c.height = 660;
+      c.getContext("2d").drawImage(img, 0, 0, 580, 660);
+      resolve(c.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  });
+}
+
+/* ---------- Génération du PDF ---------- */
+async function buildPdf(d) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
+  const W = 210, H = 297, M = 20, CW = W - 2 * M;
+  const ink = [29, 29, 31], grey = [110, 110, 115], rule = [210, 210, 215];
+  let y = M;
+
+  const font = (size, style = "normal", color = ink) => {
+    doc.setFont("helvetica", style); doc.setFontSize(size); doc.setTextColor(...color);
+  };
+  const lh = (size) => size * 0.3528 * 1.45;
+  const ensure = (h) => { if (y + h > H - 22) { doc.addPage(); y = M; } };
+  const text = (str, { size = 9.5, style = "normal", color = ink, x = M, width = CW, after = 1.6 } = {}) => {
+    font(size, style, color);
+    for (const line of doc.splitTextToSize(str, width)) {
+      ensure(lh(size));
+      y += lh(size);
+      doc.text(line, x, y);
+    }
+    y += after;
+  };
+
+  // En-tête
+  const logo = await logoPng();
+  if (logo) doc.addImage(logo, "PNG", M, y, 11, 12.5, undefined, "FAST");
+  font(12, "bold"); doc.text(ASSO.nom, M + 15, y + 5.6);
+  font(8.5, "normal", grey); doc.text(ASSO.sigle, M + 15, y + 10.4);
+  y += 22;
+  font(16, "bold"); doc.text("CONTRAT D'ENGAGEMENT BÉNÉVOLE", W / 2, y, { align: "center" });
+  y += 4;
+  doc.setDrawColor(...rule); doc.setLineWidth(0.3); doc.line(M, y, W - M, y);
+  y += 6;
+
+  // Fiche du bénévole
+  text("LE BÉNÉVOLE", { size: 8, style: "bold", color: grey, after: 1 });
+  const rows = [
+    ["Nom et prénom", `${d.nom} ${d.prenom}`],
+    ["Date de naissance", frDate(d.naissance) + (d.minor ? "  (mineur)" : "")],
+    ["Adresse", `${d.adresse}, ${d.cp} ${d.ville}`],
+    ["Téléphone", d.tel],
+    ["E-mail", d.email],
+    ["Contact d'urgence", `${d.urgNom} - ${d.urgTel}`],
+    ["Pôle", d.pole],
+    ["Début de l'engagement", d.debutTxt]
+  ];
+  if (d.minor) rows.push(["Représentant légal", `${d.parNom} (${d.parLien.toLowerCase()}) - ${d.parTel}`]);
+  for (const [k, v] of rows) {
+    font(9.5, "normal", grey);
+    ensure(lh(9.5));
+    doc.text(k, M, y + lh(9.5));
+    const before = y;
+    text(v, { x: M + 48, width: CW - 48, after: 0.4 });
+    if (y === before) y += lh(9.5);
+  }
+  y += 5;
+
+  // Articles
+  for (const b of contract(d)) {
+    ensure(lh(10.5) + lh(9.5) * 2);
+    text(b.title, { size: 10.5, style: "bold", after: 1 });
+    for (const x of b.body) {
+      if (x.p) text(x.p);
+      else for (const item of x.li) {
+        ensure(lh(9.5));
+        doc.setFillColor(...ink);
+        doc.circle(M + 2, y + lh(9.5) - 1.1, 0.55, "F");
+        text(item, { x: M + 5, width: CW - 5, after: 0.6 });
+      }
+    }
+    y += 2.5;
+  }
+
+  // Signatures
+  const now = new Date();
+  const stamp = `${frDate(todayIso())} à ${String(now.getHours()).padStart(2, "0")}h${String(now.getMinutes()).padStart(2, "0")}`;
+  const boxes = [
+    { title: "Le bénévole", sub: `${d.prenom} ${d.nom}`, note: "Lu et approuvé", img: mainPad.png() },
+    ...(d.minor ? [{ title: "Le représentant légal", sub: d.parNom, note: "Lu et approuvé", img: parentPad.png() }] : []),
+    { title: "Pour l'association", sub: ASSO.representant ? `${ASSO.representant}, ${ASSO.qualite}` : "Nom, qualité et signature", note: "", img: null }
+  ];
+  const boxH = 42;
+  ensure(12 + boxH);
+  y += 2;
+  text(`Fait à ${ASSO.ville}, le ${frDate(todayIso())}.`, { after: 4 });
+  const gap = 6, bw = (CW - gap * (boxes.length - 1)) / boxes.length;
+  boxes.forEach((bx, i) => {
+    const x = M + i * (bw + gap);
+    doc.setDrawColor(...rule); doc.setLineWidth(0.3);
+    doc.roundedRect(x, y, bw, boxH, 2, 2);
+    font(9, "bold"); doc.text(bx.title, x + 3, y + 5.5);
+    font(8, "normal", grey); doc.text(doc.splitTextToSize(bx.sub, bw - 6)[0], x + 3, y + 9.5);
+    if (bx.note) { font(8, "italic", grey); doc.text(bx.note, x + 3, y + 13.5); }
+    if (bx.img) {
+      const iw = Math.min(bw - 6, 54), ih = iw / 3;
+      doc.addImage(bx.img, "PNG", x + (bw - iw) / 2, y + 15, iw, ih, undefined, "FAST");
+      font(6.5, "normal", grey); doc.text(`Signé électroniquement le ${stamp}`, x + 3, y + boxH - 3);
+    }
+  });
+  y += boxH;
+
+  // Pied de page
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+    font(7.5, "normal", grey);
+    doc.text(`${ASSO.sigle} - Contrat d'engagement bénévole - ${d.prenom} ${d.nom}`, M, H - 12);
+    doc.text(`${i} / ${pages}`, W - M, H - 12, { align: "right" });
+    font(6.5, "normal", [160, 160, 165]);
+    doc.text("Logo provisoire", M, H - 8.5);
+  }
+  return doc;
+}
+
+/* ---------- Envoi ---------- */
+let pdfBlob = null, pdfName = "";
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const d = data();
+  const bad = validate(d);
+  if (bad.length) {
+    $("error").textContent = bad.length === 1 ? "Un élément est à compléter." : `${bad.length} éléments sont à compléter.`;
+    bad[0].scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  $("error").textContent = "";
+  if (!window.jspdf) {
+    $("error").textContent = "Impossible de charger le générateur de PDF. Vérifiez votre connexion et réessayez.";
+    return;
+  }
+  $("submit").disabled = true;
+  try {
+    const doc = await buildPdf(d);
+    const slug = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    pdfName = `Contrat-engagement_${slug(d.nom)}_${slug(d.prenom)}.pdf`;
+    pdfBlob = doc.output("blob");
+    const file = new File([pdfBlob], pdfName, { type: "application/pdf" });
+    $("share").hidden = !(navigator.canShare && navigator.canShare({ files: [file] }));
+    $("done").showModal();
+  } finally {
+    $("submit").disabled = false;
+  }
+});
+
+$("download").addEventListener("click", () => {
+  const url = URL.createObjectURL(pdfBlob);
+  const a = Object.assign(document.createElement("a"), { href: url, download: pdfName });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+});
+$("share").addEventListener("click", async () => {
+  try {
+    await navigator.share({ files: [new File([pdfBlob], pdfName, { type: "application/pdf" })], title: pdfName });
+  } catch (_) { /* partage annulé */ }
+});
+$("close").addEventListener("click", () => $("done").close());
+$("done").addEventListener("click", (e) => { if (e.target === $("done")) $("done").close(); });
+
+renderContract();
+</script>
+</body>
+</html>
